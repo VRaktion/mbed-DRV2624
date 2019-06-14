@@ -18,7 +18,7 @@ DRV2624::DRV2624(PinName p_sda, PinName p_scl)
     address = (char)(DRV2624_ADDR << 1);
 }
 
-DRV2624::DRV2624(I2C &p_i2c)
+DRV2624::DRV2624(I2C *p_i2c)
     : i2c(p_i2c)
 {
     address = (char)(DRV2624_ADDR << 1);
@@ -38,7 +38,7 @@ DRV2624::DRV2624(I2C &p_i2c)
 
 int DRV2624::init()
 {
-    enablePeriodAverage(true);
+    enableLraPeriodAverage(true);
     setLRA();
     enableControlLoop(true);
 
@@ -49,12 +49,12 @@ int DRV2624::init()
 
 int DRV2624::enableI2CBroadcast(bool en)
 {
-    return enableFlag(REG07::_ADDR, REG07::I2C_BCAST_EN, en);
+    return enableRegisterFlag(REG07::_ADDR, REG07::I2C_BCAST_EN, en);
 }
 
-int DRV2624::enablePeriodAverage(bool en)
+int DRV2624::enableLraPeriodAverage(bool en)
 {
-    return enableFlag(REG07::_ADDR, REG07::LRA_PERIOD_AVG_DIS, !en);
+    return enableRegisterFlag(REG07::_ADDR, REG07::LRA_PERIOD_AVG_DIS, !en);
 }
 
 int DRV2624::setTriggerPinFunction(DRV2624::reg07TriggerPinFunction function)
@@ -71,34 +71,36 @@ int DRV2624::setMode(DRV2624::reg07Mode mode)
 
 int DRV2624::setLRA()
 {
-    return enableFlag(REG08::_ADDR, REG08::LRA_ERM, true);
+    return enableRegisterFlag(REG08::_ADDR, REG08::LRA_ERM, true);
 }
 
 int DRV2624::setERM()
 {
-    return enableFlag(REG08::_ADDR, REG08::LRA_ERM, false);
+    return enableRegisterFlag(REG08::_ADDR, REG08::LRA_ERM, false);
 }
 
 int DRV2624::enableControlLoop(bool en)
 {
-    return enableFlag(REG08::_ADDR, REG08::CONTROL_LOOP, en);
+    return enableRegisterFlag(REG08::_ADDR, REG08::CONTROL_LOOP, en);
 }
 
 int DRV2624::enableHybridLoop(bool en)
 {
-    return enableFlag(REG08::_ADDR, REG08::HYBRID_LOOP, en);
+    return enableRegisterFlag(REG08::_ADDR, REG08::HYBRID_LOOP, en);
 }
 
 //////REG0C//////
 
 int DRV2624::go()
 {
-    return writeRegister(REG0C::_ADDR, 0x01);
+    char value = 0x01;
+    return writeRegister(REG0C::_ADDR, &value);
 }
 
 int DRV2624::stop()
 {
-    return writeRegister(REG0C::_ADDR, 0x00);
+    char value = 0x00;
+    return writeRegister(REG0C::_ADDR, &value);
 }
 
 //////REG0D//////
@@ -123,8 +125,8 @@ int DRV2624::setWaveFormSequence(char index, char value)
 
 int DRV2624::setWaitTimeSequence(char index, char time)
 {
-    value |= 0x80;
-    return writeRegister(indexToAddress(index), &value);
+    time |= 0x80;
+    return writeRegister(indexToAddress(index), &time);
 }
 
 //////REG17 - REG18//////
@@ -133,7 +135,7 @@ int DRV2624::setWaveSequenceLoop(char index, char value)
 {
     char regAddr;
     char mask;
-    if (value < 0 || value > 3)
+    if (value > 3)
     {
         return -1;
     }
@@ -181,7 +183,7 @@ int DRV2624::setWaveSequenceLoop(char index, char value)
 
 int DRV2624::setWaveSequenceMainLoop(char value)
 {
-    if (value < 0 || value > 7) //7.. infinte loop
+    if (value > 7) //7.. infinte loop
     {
         return -1;
     }
@@ -211,7 +213,7 @@ int DRV2624::setLraMinFrequency(reg27MinFreq freq)
 
 int DRV2624::setDriveTime(reg27DriveTimeUs value)
 {
-    return setRegisterValue(REG27::_ADDR, REG27::DRIVE_TIME, value);
+    return setRegisterValue(REG27::_ADDR, REG27::DRIVE_TIME, (char)value);
 }
 
 //////REG2C//////
@@ -254,15 +256,16 @@ int DRV2624::writeWaveFormToRAM(char index, uint16_t ramStartAddr, char *buffer,
     }
 
     char configByte = ((repeats & 0x7) << 5) | length;
-    char indexBuffer = {
+    char indexBuffer[3] = {
         (char)(ramStartAddr >> 8),     //start Address upper byte
         (char)(ramStartAddr & 0x00FF), //start Address lower byte
-        configByte};
+        configByte
+    };
 
     uint16_t headerAddr = ((uint16_t)index - 1) * 3 + 1;
     writeRAMBuffer(headerAddr, indexBuffer, 3);
 
-    writeRAMBuffer(ramStartAddr, buffer, length);
+    return writeRAMBuffer(ramStartAddr, buffer, length);
 }
 
 int DRV2624::setRAMAddr(uint16_t ramAddr)
@@ -272,7 +275,7 @@ int DRV2624::setRAMAddr(uint16_t ramAddr)
         return -1;
     }
 
-    char cmd[2] = {REGFD::_ADDR, (char)(ramAddr >> 8), (char)(ramAddr & 0x00FF)};
+    char cmd[3] = {REGFD::_ADDR, (char)(ramAddr >> 8), (char)(ramAddr & 0x00FF)};
     return i2c->write((int)address, cmd, 3);
 
     // char ramAddrHi = (char)(ramAddr >> 8);
@@ -284,13 +287,13 @@ int DRV2624::setRAMAddr(uint16_t ramAddr)
 int DRV2624::writeRAM1Byte(uint16_t ramAddr, char *value)
 {
     setRAMAddr(ramAddr);
-    writeRegister(REGFF::_ADDR, value);
+    return writeRegister(REGFF::_ADDR, value);
 }
 
 int DRV2624::readRAM1Byte(uint16_t ramAddr, char *value)
 {
     setRAMAddr(ramAddr);
-    readRegister(REGFF::_ADDR, value);
+    return readRegister(REGFF::_ADDR, value);
 }
 
 int DRV2624::writeRAMBuffer(uint16_t ramAddr, char *buffer, char length)
@@ -304,6 +307,7 @@ int DRV2624::writeRAMBuffer(uint16_t ramAddr, char *buffer, char length)
     {
         writeRegister(REGFF::_ADDR, buffer + i);
     }
+    return 0;
 }
 
 int DRV2624::readRAMBuffer(uint16_t ramAddr, char *buffer, char length)
@@ -317,6 +321,7 @@ int DRV2624::readRAMBuffer(uint16_t ramAddr, char *buffer, char length)
     {
         readRegister(REGFF::_ADDR, buffer + i);
     }
+    return 0;
 }
 
 //////HELPERS//////
@@ -349,6 +354,9 @@ char DRV2624::indexToAddress(char index)
     case 8:
         return REG16::_ADDR;
         break;
+    default:
+        return -1;
+        break;
     }
 }
 
@@ -370,14 +378,14 @@ int DRV2624::enableRegisterFlag(const char regAddr, char mask, bool en)
 int DRV2624::setRegisterValue(const char regAddr, char mask, char value)
 {
     uint8_t shift = 0;
-    while (!(bufMask & (1 << shift++)))
+    while (!(mask & (1 << shift++)))
         ; //getting the mask shift
     char regValue;
 
     readRegister(regAddr, &regValue);
     value &= ~mask;                  //bereich platt machen
-    value |= (value << shift) & mask //bereich neu belegen
-             return writeRegister(regAddr, &regValue);
+    value |= (value << shift) & mask; //bereich neu belegen
+    return writeRegister(regAddr, &regValue);
 }
 
 int DRV2624::writeRegister(const char reg, char *value)
