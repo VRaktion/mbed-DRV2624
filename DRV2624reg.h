@@ -1,414 +1,533 @@
 #ifndef MBED_DRV2624_REG
-#define MBED_DRV2624_REG    
-    
-    struct REGISTER
+#define MBED_DRV2624_REG
+
+class DRV2624reg
+{
+public:
+    union _00 {
+        struct d
+        {
+            unsigned REV : 4;
+            unsigned CHIPID : 4;
+        } data;
+        char reg;
+    };
+
+    union _01 {
+        struct d
+        {
+            unsigned OC_DETECT : 1;
+            unsigned OVER_TEMP : 1;
+            unsigned UVLO : 1;
+            unsigned PROCESS_DONE : 1;
+            unsigned PRG_ERROR : 1;
+            unsigned RESERVED : 2;
+            unsigned DIAG_RESULT : 1;
+        } data;
+        char reg;
+    };
+
+    union _02 {
+        struct d
+        {
+            unsigned TOGGLE_UVLO : 1;
+            unsigned TOGGLE_PROCESS_DONE : 1;
+            unsigned TOGGLE_PRG_ERROR : 1;
+            unsigned TOGGLE_OVER_TEMP : 1;
+            unsigned TOGGLE_OC_DETECT : 1;
+            unsigned RESERVED : 3;
+        } data;
+        char reg;
+    };
+
+    union _03 {
+        struct d
+        {
+            unsigned DIAG_Z_RESULT : 8;
+        } data;
+        char reg;
+    };
+
+    union _04 {
+        struct d
+        {
+            unsigned VBAT : 8;
+        } data;
+        char reg;
+    };
+
+    union _05 {
+        struct d
+        {
+            unsigned LRA_PERIOD_HI : 8;
+        } data;
+        char reg;
+    };
+
+    union _06 {
+        struct d
+        {
+            unsigned LRA_PERIOD_LO : 8;
+        } data;
+        char reg;
+    };
+
+    union _07 {
+        struct d
+        {
+            unsigned TRIG_PIN_FUNC : 2;
+            unsigned MODE : 2;
+            unsigned LRA_PERIOD_AVG_DIS : 1;
+            unsigned LINEREG_COMP_SEL : 2;
+            unsigned I2C_BCAST_EN : 1;
+        } data;
+        char reg;
+    };
+
+    enum class _07TriggerPinFunction
     {
-    public:
-        struct REG00
+        extPulse,
+        extLevel,
+        interrupt
+    };
+
+    enum class _07Mode
+    {
+        realTime,
+        waveformSequencer,
+        diagnosticsRoutine,
+        autoLevelCalib
+    };
+
+    union _08 {
+        struct d
         {
-            static const uint8_t _ADDR = 0x00;
+            unsigned RESERVED : 2;
+            unsigned LRA_ERM : 1;
+            unsigned INPUT_SLOPE_CHECK : 1;
+            unsigned HYBRID_LOOP : 1;
+            unsigned CONTROL_LOOP : 1;
+            unsigned AUTO_BRK_OL : 1;
+            unsigned AUTO_BRK_INTO_STBY : 1;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t CHIPID = 0xF0;
-            static const uint8_t REV = 0x0F;
-        };
-
-        struct REG01
+    union _09 {
+        struct d
         {
-            static const uint8_t _ADDR = 0x01;
+            unsigned UVLO_THRES : 3;
+            unsigned RESERVED : 3;
+            unsigned BAT_LIFE_EXT_LVL_EN : 2;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t DIAG_RESULT = 0x80;
-            static const uint8_t PRG_ERROR = 0x10;
-            static const uint8_t PROCESS_DONE = 0x08;
-            static const uint8_t UVLO = 0x04;
-            static const uint8_t OVER_TEMP = 0x02;
-            static const uint8_t OC_DETECT = 0x01;
-        };
-
-        struct REG02
+    union _0A {
+        struct d
         {
-            static const uint8_t _ADDR = 0x02;
+            unsigned BAT_LIFE_ECT_LVL1 : 8;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t INTZ_MASK = 0x1F;
-
-            static const uint8_t TOGGLE_OC_DETECT = 0x01;
-            static const uint8_t TOGGLE_OVER_TEMP = 0x02;
-            static const uint8_t TOGGLE_UVLO = 0x04;
-            static const uint8_t TOGGLE_PROCESS_DONE = 0x08;
-            static const uint8_t TOGGLE_PRG_ERROR = 0x10;
-        };
-
-        struct REG03
+    union _0B {
+        struct d
         {
-            static const uint8_t _ADDR = 0x03;
+            unsigned BAT_LIFE_ECT_LVL2 : 8;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t DIAG_Z_RESULT = 0xFF;
-        };
-
-        struct REG04
+    union _0C {
+        struct d
         {
-            static const uint8_t _ADDR = 0x04;
+            unsigned GO : 8;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t VBAT = 0xFF;
-        };
-
-        struct REG05
+    union _0D {
+        struct d
         {
-            static const uint8_t _ADDR = 0x05;
+            unsigned DIG_MEM_GAIN : 2;
+            unsigned RESERVED1 : 3;
+            unsigned PLAYBACK_INTERVAL : 1;
+            unsigned RESERVED2 : 2;
 
-            static const uint8_t LRA_PERIOD_HI = 0x01;
-        };
+        } data;
+        char reg;
+    };
 
-        struct REG06
+    enum class _0dPlaybackInterval
+    {
+        _1ms,
+        _5ms
+    };
+
+    enum class _0dDigMemGain
+    {
+        _100perc,
+        _75perc,
+        _50perc,
+        _25perc
+    };
+
+    union _0E {
+        struct d
         {
-            static const uint8_t _ADDR = 0x06;
+            unsigned RTP_INPUT : 8;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t LRA_PERIOD_LO = 0xFF;
-        };
-
-        struct REG07
+    union _0F {
+        struct d
         {
-            static const uint8_t _ADDR = 0x07;
+            unsigned WAV_FRM_SEQ1 : 7;
+            unsigned WAIT1 : 1;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t I2C_BCAST_EN = 0x80;
-            static const uint8_t LRA_PERIOD_AVG_DIS = 0x40;
-            static const uint8_t LINEREG_COMP_SEL = 0x30;
-            static const uint8_t TRIG_PIN_FUNC = 0x0C;
-            static const uint8_t MODE = 0x03;
-        };
-
-        enum class reg07TriggerPinFunction
+    union _10 {
+        struct d
         {
-            extPulse,
-            extLevel,
-            interrupt
-        }
+            unsigned WAV_FRM_SEQ2 : 7;
+            unsigned WAIT2 : 1;
+        } data;
+        char reg;
+    };
 
-        enum class reg07Mode
+    union _11 {
+        struct d
         {
-            realTime,
-            waveformSequencer,
-            diagnosticsRoutine,
-            autoLevelCalib
-        }
+            unsigned WAV_FRM_SEQ3 : 7;
+            unsigned WAIT3 : 1;
+        } data;
+        char reg;
+    };
 
-        struct REG08
+    union _12 {
+        struct d
         {
-            static const uint8_t _ADDR = 0x08;
+            unsigned WAV_FRM_SEQ4 : 7;
+            unsigned WAIT4 : 1;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t LRA_ERM = 0x80;
-            static const uint8_t CONTROL_LOOP = 0x40;
-            static const uint8_t HYBRID_LOOP = 0x20;
-            static const uint8_t AUTO_BRK_OL = 0x10;
-            static const uint8_t AUTO_BRK_INTO_STBY = 0x08;
-            static const uint8_t INPUT_SLOPE_CHECK = 0x04;
-        };
-
-        struct REG09
+    union _13 {
+        struct d
         {
-            static const uint8_t _ADDR = 0x09;
+            unsigned WAV_FRM_SEQ5 : 7;
+            unsigned WAIT5 : 1;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t BAT_LIFE_EXT_LVL_EN = 0xC0;
-            static const uint8_t UVLO_THRES = 0x07;
-        };
-
-        struct REG0A
+    union _14 {
+        struct d
         {
-            static const uint8_t _ADDR = 0x0A;
+            unsigned WAV_FRM_SEQ6 : 7;
+            unsigned WAIT6 : 1;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t BAT_LIFE_ECT_LVL1 = 0xFF;
-        };
-
-        struct REG0B
+    union _15 {
+        struct d
         {
-            static const uint8_t _ADDR = 0x0B;
+            unsigned WAV_FRM_SEQ7 : 7;
+            unsigned WAIT7 : 1;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t BAT_LIFE_ECT_LVL2 = 0xFF;
-        };
-
-        struct REG0C
+    union _16 {
+        struct d
         {
-            static const uint8_t _ADDR = 0x0C;
+            unsigned WAV_FRM_SEQ8 : 7;
+            unsigned WAIT8 : 1;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t GO = 0x01;
-        };
-
-        struct REG0D
+    union _17 {
+        struct d
         {
-            static const uint8_t _ADDR = 0x0D;
+            unsigned WAV1_SEQ_LOOP : 2;
+            unsigned WAV2_SEQ_LOOP : 2;
+            unsigned WAV3_SEQ_LOOP : 2;
+            unsigned WAV4_SEQ_LOOP : 2;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t PLAYBACK_INTERVAL = 0x20;
-            static const uint8_t DIG_MEM_GAIN = 0x03;
-        };
-
-        struct REG0E
+    union _18 {
+        struct d
         {
-            static const uint8_t _ADDR = 0x0E;
+            unsigned WAV5_SEQ_LOOP : 2;
+            unsigned WAV6_SEQ_LOOP : 2;
+            unsigned WAV7_SEQ_LOOP : 2;
+            unsigned WAV8_SEQ_LOOP : 2;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t RTP_INPUT = 0x7F;
-        };
-
-        struct REG0F
+    union _19 {
+        struct d
         {
-            static const uint8_t _ADDR = 0x0F;
+            unsigned WAV_SEQ_MAIN_LOOP : 8;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t WAIT1 = 0x80;
-            static const uint8_t WAV_FRM_SEQ1 = 0x7F;
-        };
-
-        struct REG10
+    union _1A {
+        struct d
         {
-            static const uint8_t _ADDR = 0x10;
+            unsigned ODT : 8;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t WAIT2 = 0x80;
-            static const uint8_t WAV_FRM_SEQ2 = 0x7F;
-        };
-
-        struct REG11
+    union _1B {
+        struct d
         {
-            static const uint8_t _ADDR = 0x11;
+            unsigned SPT : 8;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t WAIT3 = 0x80;
-            static const uint8_t WAV_FRM_SEQ3 = 0x7F;
-        };
-
-        struct REG12
+    union _1C {
+        struct d
         {
-            static const uint8_t _ADDR = 0x12;
+            unsigned SNT : 8;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t WAIT4 = 0x80;
-            static const uint8_t WAV_FRM_SEQ4 = 0x7F;
-        };
-
-        struct REG13
+    union _1D {
+        struct d
         {
-            static const uint8_t _ADDR = 0x13;
+            unsigned BRT : 8;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t WAIT5 = 0x80;
-            static const uint8_t WAV_FRM_SEQ5 = 0x7F;
-        };
-
-        struct REG14
+    union _1F {
+        struct d
         {
-            static const uint8_t _ADDR = 0x14;
+            unsigned RATED_VOLTAGE : 8;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t WAIT6 = 0x80;
-            static const uint8_t WAV_FRM_SEQ6 = 0x7F;
-        };
-
-        struct REG15
+    union _20 {
+        struct d
         {
-            static const uint8_t _ADDR = 0x15;
+            unsigned OD_CLAMP : 8;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t WAIT7 = 0x80;
-            static const uint8_t WAV_FRM_SEQ7 = 0x7F;
-        };
-
-        struct REG16
+    union _21 {
+        struct d
         {
-            static const uint8_t _ADDR = 0x16;
+            unsigned A_CAL_COMP : 8;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t WAIT8 = 0x80;
-            static const uint8_t WAV_FRM_SEQ8 = 0x7F;
-        };
-
-        struct REG17
+    union _22 {
+        struct d
         {
-            static const uint8_t _ADDR = 0x17;
+            unsigned A_CAL_BEMF : 8;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t WAV4_SEQ_LOOP = 0xC0;
-            static const uint8_t WAV3_SEQ_LOOP = 0x30;
-            static const uint8_t WAV2_SEQ_LOOP = 0x0C;
-            static const uint8_t WAV1_SEQ_LOOP = 0x03;
-        };
-
-        struct REG18
+    union _23 {
+        struct d
         {
-            static const uint8_t _ADDR = 0x18;
+            unsigned BEMF_GAIN : 2;
+            unsigned LOOP_GAIN : 2;
+            unsigned FB_BRAKE_FACTOR : 3;
+            unsigned NG_THRESH : 1;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t WAV8_SEQ_LOOP = 0xC0;
-            static const uint8_t WAV7_SEQ_LOOP = 0x30;
-            static const uint8_t WAV6_SEQ_LOOP = 0x0C;
-            static const uint8_t WAV5_SEQ_LOOP = 0x03;
-        };
-
-        struct REG19
+    union _24 {
+        struct d
         {
-            static const uint8_t _ADDR = 0x19;
+            unsigned RATED_VOLTAGE_CLAMP : 8;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t WAV_SEQ_MAIN_LOOP = 0x07;
-        };
-
-        struct REG1A
+    union _25 {
+        struct d
         {
-            static const uint8_t _ADDR = 0x1A;
+            unsigned OD_CLAMP_LVL1 : 8;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t ODT = 0xFF;
-        };
-
-        struct REG1B
+    union _26 {
+        struct d
         {
-            static const uint8_t _ADDR = 0x1B;
+            unsigned OD_CLAMP_LVL2 : 8;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t SPT = 0xFF;
-        };
-
-        struct REG1C
+    union _27 {
+        struct d
         {
-            static const uint8_t _ADDR = 0x1C;
+            unsigned DRIVE_TIME : 4;
+            unsigned RESERVED : 1;
+            unsigned LRA_RESYNC_FORMAT : 1;
+            unsigned LRA_MIN_FREQ_SEL : 1;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t SNT = 0xFF;
-        };
+    enum class _27MinFreq
+    {
+        _125Hz,
+        _145Hz
+    };
 
-        struct REG1D
+    enum class _27DriveTimeUs
+    {
+        lra500erm1000,
+        lra600erm1200,
+        lra700erm1400,
+        lra800erm1600,
+        lra900erm1800,
+        lra1000erm2000,
+        lra1100erm2200,
+        lra1200erm2400,
+        lra1300erm2600,
+        lra1400erm2800,
+        lra1500erm3000,
+        lra1600erm3200,
+        lra1700erm3400,
+        lra1800erm3600,
+        lra1900erm3800,
+        lra2000erm4000,
+        lra2100erm4200,
+        lra2200erm4400,
+        lra2300erm4600,
+        lra2400erm4800,
+        lra2500erm5000,
+        lra2600erm5200,
+        lra2700erm5400,
+        lra2800erm5600,
+        lra2900erm5800,
+        lra3000erm6000,
+        lra3100erm6200,
+        lra3200erm6400,
+        lra3300erm6600,
+        lra3400erm6800,
+        lra3500erm7000,
+        lra3600erm7200
+    };
+
+    union _28 {
+        struct d
         {
-            static const uint8_t _ADDR = 0x1D;
+            unsigned IDISS_TIME : 4;
+            unsigned BLANKING_TIME : 4;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t BRT = 0xFF;
-        };
-
-        struct REG1F
+    union _29 {
+        struct d
         {
-            static const uint8_t _ADDR = 0x1F;
+            unsigned ZC_DET_TIME : 2;
+            unsigned SAMPLE_TIME : 2;
+            unsigned OD_CLAMP_TIME : 2;
+            unsigned RESERVED : 2;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t RATED_VOLTAGE = 0xFF;
-        };
-
-        struct REG20
+    union _2A {
+        struct d
         {
-            static const uint8_t _ADDR = 0x20;
+            unsigned AUTO_CAL_TIME : 2;
+            unsigned RESERVED : 6;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t OD_CLAMP = 0xFF;
-        };
-
-        struct REG21
+    union _2C {
+        struct d
         {
-            static const uint8_t _ADDR = 0x21;
+            unsigned LRA_WAVE_SHAPE : 1;
+            unsigned RESERVED : 4;
+            unsigned AUTO_OL_CNT : 2;
+            unsigned LRA_AUTO_OPEN_LOOP : 1;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t A_CAL_COMP = 0xFF;
-        };
+    enum class _2cWaveShape
+    {
+        square,
+        sine
+    };
 
-        struct REG22
+    union _2E {
+        struct d
         {
-            static const uint8_t _ADDR = 0x22;
+            unsigned OL_LRA_PERIOD_HI : 2;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t A_CAL_BEMF = 0xFF;
-        };
-
-        struct REG23
+    union _2F {
+        struct d
         {
-            static const uint8_t _ADDR = 0x23;
+            unsigned OL_LRA_PERIOD_LO : 8;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t NG_THRESH = 0x80;
-            static const uint8_t FB_BRAKE_FACTOR = 0x70;
-            static const uint8_t LOOP_GAIN = 0x0C;
-            static const uint8_t BEMF_GAIN = 0x03;
-        };
-
-        struct REG24
+    union _30 {
+        struct d
         {
-            static const uint8_t _ADDR = 0x24;
+            unsigned CURRENT_K : 8;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t RATED_VOLTAGE_CLAMP = 0xFF;
-        };
-
-        struct REG25
+    union _FD {
+        struct d
         {
-            static const uint8_t _ADDR = 0x25;
+            unsigned RAM_ADDR_HI : 8;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t OD_CLAMP_LVL1 = 0xFF;
-        };
-
-        struct REG26
+    union _FE {
+        struct d
         {
-            static const uint8_t _ADDR = 0x26;
+            unsigned RAM_ADDR_LO : 8;
+        } data;
+        char reg;
+    };
 
-            static const uint8_t OD_CLAMP_LVL2 = 0xFF;
-        };
-
-        struct REG27
+    union _FF {
+        struct d
         {
-            static const uint8_t _ADDR = 0x27;
+            unsigned RAM_DATA : 8;
+        } data;
+        char reg;
+    };
+};
 
-            static const uint8_t LRA_MIN_FREQ_SEL = 0x80;
-            static const uint8_t LRA_RESYNC_FORMAT = 0x40;
-            static const uint8_t DRIVE_TIME = 0x1F;
-        };
-
-        struct REG28
-        {
-            static const uint8_t _ADDR = 0x28;
-
-            static const uint8_t BLANKING_TIME = 0xF0;
-            static const uint8_t IDISS_TIME = 0x0F;
-        };
-
-        struct REG29
-        {
-            static const uint8_t _ADDR = 0x29;
-
-            static const uint8_t OD_CLAMP_TIME = 0x30;
-            static const uint8_t SAMPLE_TIME = 0xC0;
-            static const uint8_t ZC_DET_TIME = 0x03;
-        };
-
-        struct REG2A
-        {
-            static const uint8_t _ADDR = 0x2A;
-
-            static const uint8_t AUTO_CAL_TIME = 0x03;
-        };
-
-        struct REG2C
-        {
-            static const uint8_t _ADDR = 0x2C;
-
-            static const uint8_t LRA_AUTO_OPEN_LOOP = 0x80;
-            static const uint8_t AUTO_OL_CNT = 0x60;
-            static const uint8_t LRA_WAVE_SHAPE = 0x01;
-        };
-
-        struct REG2E
-        {
-            static const uint8_t _ADDR = 0x2E;
-
-            static const uint8_t OL_LRA_PERIOD = 0x03;
-        };
-
-        struct REG2F
-        {
-            static const uint8_t _ADDR = 0x2F;
-
-            static const uint8_t OL_LRA_PERIOD = 0xFF;
-        };
-
-        struct REG30
-        {
-            static const uint8_t _ADDR = 0x30;
-
-            static const uint8_t CURRENT_K = 0xFF;
-        };
-
-        struct REGFD
-        {
-            static const uint8_t _ADDR = 0xFD;
-
-            static const uint8_t RAM_ADDR_HI = 0xFF;
-        };
-
-        struct REGFE
-        {
-            static const uint8_t _ADDR = 0xFE;
-
-            static const uint8_t RAM_ADDR_LO = 0xFF;
-        };
-
-        struct REGFF
-        {
-            static const uint8_t _ADDR = 0xFF;
-
-            static const uint8_t RAM_DATA = 0xFF;
-        };
-
-    }
-
-    #endif //MBED_DRV2624_REG
+#endif //MBED_DRV2624_REG

@@ -25,9 +25,9 @@ DRV2624::DRV2624(I2C *p_i2c)
 }
 
 // Play a Waveform or Waveform Sequence from the RAM Waveform Memory
-// 1. Initialize the device as listed in the Initialization Procedure section.
-// 1. After power-up, wait at least 1ms before the DRV2624 device accepts I2C commands.
-// 2. Assert the NRST pin (logichigh). The NRST pin can be asserted anytime during or after the wait period.
+// 1. Initialize the device as listed in the Initialization Procedure section:
+//  1. After power-up, wait at least 1ms before the DRV2624 device accepts I2C commands.
+//  2. Assert the NRST pin (logichigh). The NRST pin can be asserted anytime during or after the wait period.
 // 3. Write the MODE parameter (address0x01) to value 0x00 to remove the device from standby mode.
 // 4. Run auto-calibration to configure the DRV2624 device for the desired actuator. Alternatively, rewrite the results from a previous calibration.
 // 5. If using the embedded RAM memory, populate the RAM with waveforms at this time.
@@ -38,9 +38,8 @@ DRV2624::DRV2624(I2C *p_i2c)
 
 int DRV2624::init()
 {
-    enableLraPeriodAverage(true);
-    setLRA();
-    enableControlLoop(true);
+    wait_ms(1);
+    setMode(DRV2624reg::_07Mode::realTime);
 
     return 0;
 }
@@ -49,44 +48,76 @@ int DRV2624::init()
 
 int DRV2624::enableI2CBroadcast(bool en)
 {
-    return enableRegisterFlag(REG07::_ADDR, REG07::I2C_BCAST_EN, en);
+    // return enableRegisterFlag(REG07::_ADDR, REG07::I2C_BCAST_EN, en);
+    DRV2624reg::_07 reg07;
+    readRegister(0x07, &(reg07.reg));
+    reg07.data.I2C_BCAST_EN = (unsigned)en;
+    return writeRegister(0x07, &(reg07.reg));
 }
 
 int DRV2624::enableLraPeriodAverage(bool en)
 {
-    return enableRegisterFlag(REG07::_ADDR, REG07::LRA_PERIOD_AVG_DIS, !en);
+    // return enableRegisterFlag(REG07::_ADDR, REG07::LRA_PERIOD_AVG_DIS, !en);
+    DRV2624reg::_07 reg07;
+    readRegister(0x07, &(reg07.reg));
+    reg07.data.LRA_PERIOD_AVG_DIS = (unsigned)en;
+    return writeRegister(0x07, &(reg07.reg));
 }
 
-int DRV2624::setTriggerPinFunction(DRV2624::reg07TriggerPinFunction function)
+int DRV2624::setTriggerPinFunction(DRV2624reg::_07TriggerPinFunction function)
 {
-    return setRegisterValue(REG07::_ADDR, REG07::TRIG_PIN_FUNC, (char)function);
+    // return setRegisterValue(REG07::_ADDR, REG07::TRIG_PIN_FUNC, (char)function);
+    DRV2624reg::_07 reg07;
+    readRegister(0x07, &(reg07.reg));
+    reg07.data.TRIG_PIN_FUNC = (unsigned)function;
+    return writeRegister(0x07, &(reg07.reg));
 }
 
-int DRV2624::setMode(DRV2624::reg07Mode mode)
+int DRV2624::setMode(DRV2624reg::_07Mode mode)
 {
-    return setRegisterValue(REG07::_ADDR, REG07::MODE, (char)mode);
+    // return setRegisterValue(REG07::_ADDR, REG07::MODE, (char)mode);
+    DRV2624reg::_07 reg07;
+    readRegister(0x07, &(reg07.reg));
+    reg07.data.MODE = (unsigned)mode;
+    return writeRegister(0x07, &(reg07.reg));
 }
 
 //////REG08//////
 
 int DRV2624::setLRA()
 {
-    return enableRegisterFlag(REG08::_ADDR, REG08::LRA_ERM, true);
+    // return enableRegisterFlag(REG08::_ADDR, REG08::LRA_ERM, true);
+    DRV2624reg::_08 reg08;
+    readRegister(0x08, &(reg08.reg));
+    reg08.data.LRA_ERM = 1;
+    return writeRegister(0x08, &(reg08.reg));
 }
 
 int DRV2624::setERM()
 {
-    return enableRegisterFlag(REG08::_ADDR, REG08::LRA_ERM, false);
+    // return enableRegisterFlag(REG08::_ADDR, REG08::LRA_ERM, false);
+    DRV2624reg::_08 reg08;
+    readRegister(0x08, &(reg08.reg));
+    reg08.data.LRA_ERM = 0;
+    return writeRegister(0x08, &(reg08.reg));
 }
 
 int DRV2624::enableControlLoop(bool en)
 {
-    return enableRegisterFlag(REG08::_ADDR, REG08::CONTROL_LOOP, en);
+    // return enableRegisterFlag(REG08::_ADDR, REG08::CONTROL_LOOP, en);
+    DRV2624reg::_08 reg08;
+    readRegister(0x08, &(reg08.reg));
+    reg08.data.CONTROL_LOOP = (unsigned)en;
+    return writeRegister(0x08, &(reg08.reg));
 }
 
 int DRV2624::enableHybridLoop(bool en)
 {
-    return enableRegisterFlag(REG08::_ADDR, REG08::HYBRID_LOOP, en);
+    // return enableRegisterFlag(REG08::_ADDR, REG08::HYBRID_LOOP, en);
+    DRV2624reg::_08 reg08;
+    readRegister(0x08, &(reg08.reg));
+    reg08.data.HYBRID_LOOP = (unsigned)en;
+    return writeRegister(0x08, &(reg08.reg));
 }
 
 //////REG0C//////
@@ -94,25 +125,33 @@ int DRV2624::enableHybridLoop(bool en)
 int DRV2624::go()
 {
     char value = 0x01;
-    return writeRegister(REG0C::_ADDR, &value);
+    return writeRegister(0x0C, &value);
 }
 
 int DRV2624::stop()
 {
     char value = 0x00;
-    return writeRegister(REG0C::_ADDR, &value);
+    return writeRegister(0x0C, &value);
 }
 
 //////REG0D//////
 
-int DRV2624::setPlaybackInterval(reg0dPlaybackInterval interval)
+int DRV2624::setPlaybackInterval(DRV2624reg::_0dPlaybackInterval interval)
 {
-    return enableRegisterFlag(REG0D::_ADDR, REG0D::PLAYBACK_INTERVAL, (bool)interval);
+    // return enableRegisterFlag(REG0D::_ADDR, REG0D::PLAYBACK_INTERVAL, (bool)interval);
+    DRV2624reg::_0D reg0D;
+    readRegister(0x0D, &(reg0D.reg));
+    reg0D.data.PLAYBACK_INTERVAL = (unsigned)interval;
+    return writeRegister(0x0D, &(reg0D.reg));
 }
 
-int DRV2624::setDigMemGain(DRV2624::reg0dDigMemGain gain)
+int DRV2624::setDigMemGain(DRV2624reg::_0dDigMemGain gain)
 {
-    return setRegisterValue(REG0D::_ADDR, REG0D::DIG_MEM_GAIN, (char)gain);
+    // return setRegisterValue(REG0D::_ADDR, REG0D::DIG_MEM_GAIN, (char)gain);
+    DRV2624reg::_0D reg0D;
+    readRegister(0x0D, &(reg0D.reg));
+    reg0D.data.PLAYBACK_INTERVAL = (unsigned)gain;
+    return writeRegister(0x0D, &(reg0D.reg));
 }
 
 //////REG0F - REG16//////
@@ -139,44 +178,55 @@ int DRV2624::setWaveSequenceLoop(char index, char value)
     {
         return -1;
     }
-    switch (index)
+
+    if (index < 5)
     {
-    case 1:
-        regAddr = REG17::_ADDR;
-        mask = REG17::WAV1_SEQ_LOOP;
-        break;
-    case 2:
-        regAddr = REG17::_ADDR;
-        mask = REG17::WAV2_SEQ_LOOP;
-        break;
-    case 3:
-        regAddr = REG17::_ADDR;
-        mask = REG17::WAV3_SEQ_LOOP;
-        break;
-    case 4:
-        regAddr = REG17::_ADDR;
-        mask = REG17::WAV4_SEQ_LOOP;
-        break;
-    case 5:
-        regAddr = REG18::_ADDR;
-        mask = REG18::WAV5_SEQ_LOOP;
-        break;
-    case 6:
-        regAddr = REG18::_ADDR;
-        mask = REG18::WAV6_SEQ_LOOP;
-        break;
-    case 7:
-        regAddr = REG18::_ADDR;
-        mask = REG18::WAV7_SEQ_LOOP;
-        break;
-    case 8:
-        regAddr = REG18::_ADDR;
-        mask = REG18::WAV8_SEQ_LOOP;
-        break;
-    default:
-        return -1;
+        DRV2624reg::_17 reg17;
+        readRegister(0x17, &(reg17.reg));
+        switch (index)
+        {
+        case 1:
+            reg17.data.WAV1_SEQ_LOOP = (unsigned)value;
+            break;
+        case 2:
+            reg17.data.WAV2_SEQ_LOOP = (unsigned)value;
+            break;
+        case 3:
+            reg17.data.WAV3_SEQ_LOOP = (unsigned)value;
+            break;
+        case 4:
+            reg17.data.WAV4_SEQ_LOOP = (unsigned)value;
+            break;
+        default:
+            return -1;
+            break;
+        };
+        return writeRegister(0x17, &(reg17.reg));
     }
-    return setRegisterValue(regAddr, mask, value);
+    else
+    {
+        DRV2624reg::_18 reg18;
+        readRegister(0x18, &(reg18.reg));
+        switch (index)
+        {
+        case 5:
+            reg18.data.WAV5_SEQ_LOOP = (unsigned)value;
+            break;
+        case 6:
+            reg18.data.WAV6_SEQ_LOOP = (unsigned)value;
+            break;
+        case 7:
+            reg18.data.WAV7_SEQ_LOOP = (unsigned)value;
+            break;
+        case 8:
+            reg18.data.WAV8_SEQ_LOOP = (unsigned)value;
+            break;
+        default:
+            return -1;
+            break;
+        };
+        return writeRegister(0x18, &(reg18.reg));
+    }
 }
 
 //////REG19//////
@@ -187,40 +237,64 @@ int DRV2624::setWaveSequenceMainLoop(char value)
     {
         return -1;
     }
-    return setRegisterValue(REG19::_ADDR, REG19::WAV_SEQ_MAIN_LOOP, value);
+    // return setRegisterValue(REG19::_ADDR, REG19::WAV_SEQ_MAIN_LOOP, value);
+    DRV2624reg::_19 reg19;
+    readRegister(0x19, &(reg19.reg));
+    reg19.data.WAV_SEQ_MAIN_LOOP = (unsigned)value;
+    return writeRegister(0x19, &(reg19.reg));
 }
 
 //////REG1A/////
 
 int DRV2624::setOverdriveOpenLoop(char value)
 {
-    return writeRegister(REG1A::_ADDR, &value);
+    // return writeRegister(REG1A::_ADDR, &value);
+    DRV2624reg::_1A reg1A;
+    readRegister(0x1A, &(reg1A.reg));
+    reg1A.data.ODT = (unsigned)value;
+    return writeRegister(0x1A, &(reg1A.reg));
 }
 
 //////REG1F//////
 
 int DRV2624::setRatedMotorVoltage(char value)
 {
-    return writeRegister(REG1F::_ADDR, &value);
+    // return writeRegister(REG1F::_ADDR, &value);
+    DRV2624reg::_1F reg1F;
+    readRegister(0x1F, &(reg1F.reg));
+    reg1F.data.RATED_VOLTAGE = (unsigned)value;
+    return writeRegister(0x1F, &(reg1F.reg));
 }
 
 //////REG27//////
 
-int DRV2624::setLraMinFrequency(reg27MinFreq freq)
+int DRV2624::setLraMinFrequency(DRV2624reg::_27MinFreq freq)
 { //0..125Hz, 1..45Hz
-    return enableRegisterFlag(REG27::_ADDR, REG27::LRA_MIN_FREQ_SEL, (bool)freq);
+    // return enableRegisterFlag(REG27::_ADDR, REG27::LRA_MIN_FREQ_SEL, (bool)freq);
+    DRV2624reg::_27 reg27;
+    readRegister(0x27, &(reg27.reg));
+    reg27.data.LRA_MIN_FREQ_SEL = (unsigned)freq;
+    return writeRegister(0x27, &(reg27.reg));
 }
 
-int DRV2624::setDriveTime(reg27DriveTimeUs value)
+int DRV2624::setDriveTime(DRV2624reg::_27DriveTimeUs value)
 {
-    return setRegisterValue(REG27::_ADDR, REG27::DRIVE_TIME, (char)value);
+    // return setRegisterValue(REG27::_ADDR, REG27::DRIVE_TIME, (char)value);
+    DRV2624reg::_27 reg27;
+    readRegister(0x27, &(reg27.reg));
+    reg27.data.DRIVE_TIME = (unsigned)value;
+    return writeRegister(0x27, &(reg27.reg));
 }
 
 //////REG2C//////
 
-int DRV2624::setLraWaveShape(reg2cWaveShape wave)
+int DRV2624::setLraWaveShape(DRV2624reg::_2cWaveShape wave)
 {
-    return enableRegisterFlag(REG2C::_ADDR, REG2C::LRA_WAVE_SHAPE, (bool)wave);
+    // return enableRegisterFlag(REG2C::_ADDR, REG2C::LRA_WAVE_SHAPE, (bool)wave);
+    DRV2624reg::_2C reg2C;
+    readRegister(0x2C, &(reg2C.reg));
+    reg2C.data.LRA_WAVE_SHAPE = (unsigned)wave;
+    return writeRegister(0x2C, &(reg2C.reg));
 }
 
 //////REG2E-REG2F//////
@@ -228,17 +302,18 @@ int DRV2624::setLraWaveShape(reg2cWaveShape wave)
 uint16_t DRV2624::getLraPeriod()
 {
     uint16_t period = 0;
-    char buf;
-    readRegister(REG2E::_ADDR, &buf);
-    period |= (buf & REG2E::OL_LRA_PERIOD) << 8;
-    readRegister(REG2F::_ADDR, &buf);
-    period |= buf;
+    DRV2624reg::_2E reg2E;
+    DRV2624reg::_2F reg2F;
+    readRegister(0x2E, &(reg2E.reg));
+    period |= reg2E.data.OL_LRA_PERIOD_HI << 8;
+    readRegister(0x2F, &(reg2F.reg));
+    period |= reg2F.data.OL_LRA_PERIOD_LO;
     return period;
 }
 
 //////REGFD-REGFF//////
 
-int DRV2624::writeWaveFormToRAM(char index, uint16_t ramStartAddr, char *buffer, char length, char repeats)
+int DRV2624::writeHeaderEntry(char index, uint16_t ramStartAddr, char length, char repeats)
 {
     if (index < 1 || index > 127)
     { //0 is revision, max 127
@@ -259,12 +334,15 @@ int DRV2624::writeWaveFormToRAM(char index, uint16_t ramStartAddr, char *buffer,
     char indexBuffer[3] = {
         (char)(ramStartAddr >> 8),     //start Address upper byte
         (char)(ramStartAddr & 0x00FF), //start Address lower byte
-        configByte
-    };
+        configByte};
 
     uint16_t headerAddr = ((uint16_t)index - 1) * 3 + 1;
-    writeRAMBuffer(headerAddr, indexBuffer, 3);
+    return writeRAMBuffer(headerAddr, indexBuffer, 3);
+}
 
+int DRV2624::writeWaveFormToRAM(char index, uint16_t ramStartAddr, char *buffer, char length, char repeats)
+{
+    writeHeaderEntry(index, ramStartAddr, length, repeats);
     return writeRAMBuffer(ramStartAddr, buffer, length);
 }
 
@@ -275,7 +353,7 @@ int DRV2624::setRAMAddr(uint16_t ramAddr)
         return -1;
     }
 
-    char cmd[3] = {REGFD::_ADDR, (char)(ramAddr >> 8), (char)(ramAddr & 0x00FF)};
+    char cmd[3] = {0xFD, (char)(ramAddr >> 8), (char)(ramAddr & 0x00FF)};
     return i2c->write((int)address, cmd, 3);
 
     // char ramAddrHi = (char)(ramAddr >> 8);
@@ -284,16 +362,30 @@ int DRV2624::setRAMAddr(uint16_t ramAddr)
     // writeRegister(REGFE::_ADDR, &ramAddrLo);
 }
 
+int DRV2624::writeConstWave(char voltage, char time)
+{
+    char value = voltage & 0x7F;
+    writeRegister(0xFF, &value); //unset ramp bit
+    writeRegister(0xFF, &time);
+}
+
+int DRV2624::writeRampWave(char voltage, char time)
+{
+    char value = voltage | 0x80;
+    writeRegister(0xFF, &value); //set ramp bit
+    writeRegister(0xFF, &time);
+}
+
 int DRV2624::writeRAM1Byte(uint16_t ramAddr, char *value)
 {
     setRAMAddr(ramAddr);
-    return writeRegister(REGFF::_ADDR, value);
+    return writeRegister(0xFF, value);
 }
 
 int DRV2624::readRAM1Byte(uint16_t ramAddr, char *value)
 {
     setRAMAddr(ramAddr);
-    return readRegister(REGFF::_ADDR, value);
+    return readRegister(0xFF, value);
 }
 
 int DRV2624::writeRAMBuffer(uint16_t ramAddr, char *buffer, char length)
@@ -305,7 +397,7 @@ int DRV2624::writeRAMBuffer(uint16_t ramAddr, char *buffer, char length)
     }
     for (uint16_t i = 0; i < length; i++)
     {
-        writeRegister(REGFF::_ADDR, buffer + i);
+        writeRegister(0xFF, buffer + i);
     }
     return 0;
 }
@@ -319,7 +411,7 @@ int DRV2624::readRAMBuffer(uint16_t ramAddr, char *buffer, char length)
     }
     for (uint16_t i = 0; i < length; i++)
     {
-        readRegister(REGFF::_ADDR, buffer + i);
+        readRegister(0xFF, buffer + i);
     }
     return 0;
 }
@@ -331,28 +423,28 @@ char DRV2624::indexToAddress(char index)
     switch (index)
     {
     case 1:
-        return REG0F::_ADDR;
+        return 0x0F;
         break;
     case 2:
-        return REG10::_ADDR;
+        return 0x10;
         break;
     case 3:
-        return REG11::_ADDR;
+        return 0x11;
         break;
     case 4:
-        return REG12::_ADDR;
+        return 0x12;
         break;
     case 5:
-        return REG13::_ADDR;
+        return 0x13;
         break;
     case 6:
-        return REG14::_ADDR;
+        return 0x14;
         break;
     case 7:
-        return REG15::_ADDR;
+        return 0x15;
         break;
     case 8:
-        return REG16::_ADDR;
+        return 0x16;
         break;
     default:
         return -1;
@@ -383,7 +475,7 @@ int DRV2624::setRegisterValue(const char regAddr, char mask, char value)
     char regValue;
 
     readRegister(regAddr, &regValue);
-    value &= ~mask;                  //bereich platt machen
+    value &= ~mask;                   //bereich platt machen
     value |= (value << shift) & mask; //bereich neu belegen
     return writeRegister(regAddr, &regValue);
 }
