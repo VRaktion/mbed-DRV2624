@@ -1,3 +1,6 @@
+#ifndef MBED_DRV2624_WAVEFORMS_H
+#define MBED_DRV2624_WAVEFORMS_H
+
 // union waveFormData{
 //     struct data{
 //         unsigned ramp : 1;
@@ -17,3 +20,5 @@ struct waveFormData{
 
 extern const char waveform0[];
 extern const char waveform1[];
+
+#endif //MBED_DRV2624_WAVEFORMS_H

@@ -8,6 +8,9 @@
  *      Created: August      6th, 2019
  */
 
+#ifndef MBED_DRV2624_CPP
+#define MBED_DRV2624_CPP
+
 #include "mbed.h"
 #include "DRV2624.h"
 // #include "DRV2624reg.h"
@@ -501,3 +504,5 @@ void DRV2624::unsetBit(char *reg, char mask)
 {
     *reg &= ~mask;
 }
+
+#endif //MBED_DRV2624_CPP

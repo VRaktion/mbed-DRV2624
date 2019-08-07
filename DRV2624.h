@@ -8,8 +8,8 @@
  *      Created: August      6th, 2019
  */
 
-#ifndef MBED_DRV2624
-#define MBED_DRV2624
+#ifndef MBED_DRV2624_H
+#define MBED_DRV2624_H
 
 #include "DRV2624reg.h"
 
@@ -91,4 +91,4 @@ protected:
     I2C *i2c;
 };
 
-#endif //MBED_DRV2624
+#endif //MBED_DRV2624_H
