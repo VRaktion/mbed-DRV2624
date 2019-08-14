@@ -41,7 +41,8 @@ DRV2624::DRV2624(I2C *p_i2c)
 
 int DRV2624::init()
 {
-    wait_ms(1);
+    // wait_ms(1);
+    ThisThread::sleep_for(1);
     setMode(DRV2624reg::_07Mode::realTime);
 
     return 0;
@@ -368,15 +369,19 @@ int DRV2624::setRAMAddr(uint16_t ramAddr)
 int DRV2624::writeConstWave(char voltage, char time)
 {
     char value = voltage & 0x7F;
-    writeRegister(0xFF, &value); //unset ramp bit
-    writeRegister(0xFF, &time);
+    int status = 0;
+    status &= writeRegister(0xFF, &value); //unset ramp bit
+    status &= writeRegister(0xFF, &time);
+    return status;
 }
 
 int DRV2624::writeRampWave(char voltage, char time)
 {
     char value = voltage | 0x80;
-    writeRegister(0xFF, &value); //set ramp bit
-    writeRegister(0xFF, &time);
+    int status = 0;
+    status &= writeRegister(0xFF, &value); //set ramp bit
+    status &= writeRegister(0xFF, &time);
+    return status;
 }
 
 int DRV2624::writeRAM1Byte(uint16_t ramAddr, char *value)
