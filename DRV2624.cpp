@@ -58,6 +58,7 @@ int DRV2624::calibrateLRA(){
     // this->setIdissTime(DRV2624reg::_28BlankingOrIdissTimeUs::lra25erm75);
     // this->setZcDetTime(DRV2624reg::_29ZcDetTime::_100us);
     // this->go();
+    return 0;
 }
 
 //////REG00//////
@@ -317,6 +318,7 @@ int DRV2624::setWaveSequenceLoop(char index, char value)
         };
         return writeRegister(0x18, &(reg18.reg));
     }
+    return 0;
 }
 
 //////REG19//////
@@ -657,6 +659,7 @@ char DRV2624::indexToAddress(char index)
         return -1;
         break;
     }
+    return 0;
 }
 
 int DRV2624::enableRegisterFlag(const char regAddr, char mask, bool en)
