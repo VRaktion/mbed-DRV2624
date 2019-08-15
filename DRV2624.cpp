@@ -8,9 +8,6 @@
  *      Created: August      6th, 2019
  */
 
-#ifndef MBED_DRV2624_CPP
-#define MBED_DRV2624_CPP
-
 #include "mbed.h"
 #include "DRV2624.h"
 // #include "DRV2624reg.h"
@@ -41,12 +38,94 @@ DRV2624::DRV2624(I2C *p_i2c)
 
 int DRV2624::init()
 {
-    // wait_ms(1);
     ThisThread::sleep_for(1);
     setMode(DRV2624reg::_07Mode::realTime);
 
     return 0;
 }
+
+int DRV2624::calibrateLRA(){
+    // setMode(DRV2624reg::_07Mode::autoLevelCalib);
+    // setLRA();
+    // this->setFbBrakeFactor(3);
+    // this->setLoopGain(2);
+    // this->setRatedMotorVoltage(0x6B);
+    // this->setOCClamp(0x79);
+    // this->setAutoCalTime(DRV2624reg::_2aAutoCalTime::triggerControlled);//DRV2624reg::_2aAutoCalTime::_1);//
+    // this->setDriveTime(DRV2624reg::_27DriveTimeUs::lra2500erm5000);//2.5ms == 200hz
+    // this->setSampleTime(DRV2624reg::_29SampleTime::_300us);
+    // this->setBlankingTime(DRV2624reg::_28BlankingOrIdissTimeUs::lra25erm75);
+    // this->setIdissTime(DRV2624reg::_28BlankingOrIdissTimeUs::lra25erm75);
+    // this->setZcDetTime(DRV2624reg::_29ZcDetTime::_100us);
+    // this->go();
+}
+
+//////REG00//////
+
+    char DRV2624::getDeviceId(){
+        DRV2624reg::_00 reg00;
+        readRegister(0x00, &(reg00.reg));
+        return reg00.data.CHIPID;
+    }
+
+    char DRV2624::getDeviceRevision(){
+        DRV2624reg::_00 reg00;
+        readRegister(0x00, &(reg00.reg));
+        return reg00.data.REV;
+    }
+
+//////REG01//////
+
+    bool DRV2624::getDiagResFlag(){
+        DRV2624reg::_01 reg01;
+        readRegister(0x01, &(reg01.reg));
+        return reg01.data.DIAG_RESULT;
+    }
+
+    bool DRV2624::getPrgErrorFlag(){
+        DRV2624reg::_01 reg01;
+        readRegister(0x01, &(reg01.reg));
+        return reg01.data.PRG_ERROR;
+    }
+
+    bool DRV2624::getProcessDoneFlag(){
+        DRV2624reg::_01 reg01;
+        readRegister(0x01, &(reg01.reg));
+        return reg01.data.PROCESS_DONE;
+    }
+
+    bool DRV2624::getUVLOFlag(){
+        DRV2624reg::_01 reg01;
+        readRegister(0x01, &(reg01.reg));
+        return reg01.data.UVLO;
+    }
+
+    bool DRV2624::getOverTempFlag(){
+        DRV2624reg::_01 reg01;
+        readRegister(0x01, &(reg01.reg));
+        return reg01.data.OVER_TEMP;
+    }
+
+    bool DRV2624::getOCDetectFlag(){
+        DRV2624reg::_01 reg01;
+        readRegister(0x01, &(reg01.reg));
+        return reg01.data.OC_DETECT;
+    }
+
+    char DRV2624::getStatusFlags(){
+        DRV2624reg::_01 reg01;
+        readRegister(0x01, &(reg01.reg));
+        return reg01.reg;
+    }
+
+//////REG03//////
+
+    char DRV2624::getDiagZResult(){
+        DRV2624reg::_03 reg03;
+        readRegister(0x03, &(reg03.reg));
+        return reg03.reg;
+    }
+
 
 //////REG07//////
 
@@ -93,7 +172,7 @@ int DRV2624::setLRA()
     // return enableRegisterFlag(REG08::_ADDR, REG08::LRA_ERM, true);
     DRV2624reg::_08 reg08;
     readRegister(0x08, &(reg08.reg));
-    reg08.data.LRA_ERM = 1;
+    reg08.data.LRA_ERM = 1;//0;//
     return writeRegister(0x08, &(reg08.reg));
 }
 
@@ -102,7 +181,7 @@ int DRV2624::setERM()
     // return enableRegisterFlag(REG08::_ADDR, REG08::LRA_ERM, false);
     DRV2624reg::_08 reg08;
     readRegister(0x08, &(reg08.reg));
-    reg08.data.LRA_ERM = 0;
+    reg08.data.LRA_ERM = 0;//1;//
     return writeRegister(0x08, &(reg08.reg));
 }
 
@@ -111,7 +190,7 @@ int DRV2624::enableControlLoop(bool en)
     // return enableRegisterFlag(REG08::_ADDR, REG08::CONTROL_LOOP, en);
     DRV2624reg::_08 reg08;
     readRegister(0x08, &(reg08.reg));
-    reg08.data.CONTROL_LOOP = (unsigned)en;
+    reg08.data.CONTROL_LOOP = (unsigned)!en;
     return writeRegister(0x08, &(reg08.reg));
 }
 
@@ -156,6 +235,13 @@ int DRV2624::setDigMemGain(DRV2624reg::_0dDigMemGain gain)
     readRegister(0x0D, &(reg0D.reg));
     reg0D.data.PLAYBACK_INTERVAL = (unsigned)gain;
     return writeRegister(0x0D, &(reg0D.reg));
+}
+
+//////REG0E//////
+
+int DRV2624::setRealTimeAmplitude(char amplitude)//signed!
+{
+    return writeRegister(0x0E, &amplitude);
 }
 
 //////REG0F - REG16//////
@@ -263,11 +349,75 @@ int DRV2624::setOverdriveOpenLoop(char value)
 
 int DRV2624::setRatedMotorVoltage(char value)
 {
-    // return writeRegister(REG1F::_ADDR, &value);
-    DRV2624reg::_1F reg1F;
-    readRegister(0x1F, &(reg1F.reg));
-    reg1F.data.RATED_VOLTAGE = (unsigned)value;
-    return writeRegister(0x1F, &(reg1F.reg));
+    return writeRegister(0x1F, &value);
+}
+
+//////REG20//////
+
+int DRV2624::setOCClamp(char value)
+{
+    return writeRegister(0x20, &value);
+}
+
+//////REG21//////
+
+char DRV2624::getVoltageCompensation()
+{
+    char res;
+    readRegister(0x21, &res);
+    return res;
+}
+
+int DRV2624::setVoltageCompensation(char value)
+{
+    return writeRegister(0x21, &value);
+}
+
+//////REG22//////
+
+char DRV2624::getFeedbackValue()
+{
+    char res;
+    readRegister(0x22, &res);
+    return res;
+}
+
+int DRV2624::setFeedbackValue(char value)
+{
+    return writeRegister(0x22, &value);
+}
+
+//////REG23//////
+
+int DRV2624::setLoopGain(char value)
+{
+    DRV2624reg::_23 reg23;
+    readRegister(0x23, &(reg23.reg));
+    reg23.data.LOOP_GAIN = (unsigned)value;
+    return writeRegister(0x23, &(reg23.reg));
+}
+
+int DRV2624::setFbBrakeFactor(char value)
+{
+    DRV2624reg::_23 reg23;
+    readRegister(0x23, &(reg23.reg));
+    reg23.data.FB_BRAKE_FACTOR = (unsigned)value;
+    return writeRegister(0x23, &(reg23.reg));
+}
+
+char DRV2624::getFeedbackGain()
+{
+    DRV2624reg::_23 reg23;
+    readRegister(0x22, &(reg23.reg));
+    return reg23.data.BEMF_GAIN;
+}
+
+int DRV2624::setFeedbackGain(DRV2624reg::_23BemfGain gain)
+{
+    DRV2624reg::_23 reg23;
+    readRegister(0x23, &(reg23.reg));
+    reg23.data.BEMF_GAIN = (unsigned)gain;
+    return writeRegister(0x23, &(reg23.reg));
 }
 
 //////REG27//////
@@ -288,6 +438,55 @@ int DRV2624::setDriveTime(DRV2624reg::_27DriveTimeUs value)
     readRegister(0x27, &(reg27.reg));
     reg27.data.DRIVE_TIME = (unsigned)value;
     return writeRegister(0x27, &(reg27.reg));
+}
+
+//////REG28//////
+
+int DRV2624::setBlankingTime(DRV2624reg::_28BlankingOrIdissTimeUs time)
+{
+    // return setRegisterValue(REG27::_ADDR, REG27::DRIVE_TIME, (char)value);
+    DRV2624reg::_28 reg28;
+    readRegister(0x28, &(reg28.reg));
+    reg28.data.BLANKING_TIME = (unsigned)time;
+    return writeRegister(0x28, &(reg28.reg));
+}
+
+int DRV2624::setIdissTime(DRV2624reg::_28BlankingOrIdissTimeUs time)
+{
+    // return setRegisterValue(REG27::_ADDR, REG27::DRIVE_TIME, (char)value);
+    DRV2624reg::_28 reg28;
+    readRegister(0x28, &(reg28.reg));
+    reg28.data.IDISS_TIME = (unsigned)time;
+    return writeRegister(0x28, &(reg28.reg));
+}
+
+//////REG29//////
+
+int DRV2624::setSampleTime(DRV2624reg::_29SampleTime time)
+{
+    DRV2624reg::_29 reg29;
+    readRegister(0x29, &(reg29.reg));
+    reg29.data.SAMPLE_TIME = (unsigned)time;
+    return writeRegister(0x29, &(reg29.reg));
+}
+
+int DRV2624::setZcDetTime(DRV2624reg::_29ZcDetTime time)
+{
+    DRV2624reg::_29 reg29;
+    readRegister(0x29, &(reg29.reg));
+    reg29.data.ZC_DET_TIME = (unsigned)time;
+    return writeRegister(0x29, &(reg29.reg));
+}
+
+//////REG2A//////
+
+int DRV2624::setAutoCalTime(DRV2624reg::_2aAutoCalTime time)
+{
+    // return enableRegisterFlag(REG2C::_ADDR, REG2C::LRA_WAVE_SHAPE, (bool)wave);
+    DRV2624reg::_2A reg2A;
+    readRegister(0x2A, &(reg2A.reg));
+    reg2A.data.AUTO_CAL_TIME = (unsigned)time;
+    return writeRegister(0x2A, &(reg2A.reg));
 }
 
 //////REG2C//////
@@ -488,16 +687,22 @@ int DRV2624::setRegisterValue(const char regAddr, char mask, char value)
     return writeRegister(regAddr, &regValue);
 }
 
+// Serial pcd(USBTX, USBRX, "debug", 115200);
+
 int DRV2624::writeRegister(const char reg, char *value)
 {
     char cmd[2] = {reg, *value};
-    return i2c->write((int)address, cmd, 2);
+    // pcd.printf("write reg %x: %x\r\n", reg, *value);
+    i2c->write((int)address, cmd, 2);
+    return 0;
 }
 
 int DRV2624::readRegister(const char reg, char *value)
 {
     i2c->write((int)address, (const char *)&reg, 1);
-    return i2c->read((int)address, (char *)value, 1);
+    i2c->read((int)address, (char *)value, 1);
+    // pcd.printf("read reg %x: %x\r\n", reg, *value);
+    return 0;
 }
 
 void DRV2624::setBit(char *reg, char mask)
@@ -509,5 +714,3 @@ void DRV2624::unsetBit(char *reg, char mask)
 {
     *reg &= ~mask;
 }
-
-#endif //MBED_DRV2624_CPP

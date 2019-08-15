@@ -32,6 +32,7 @@ public:
     DRV2624(I2C *p_i2c);
 
     int init();
+    int calibrateLRA();
 
     int enableI2CBroadcast(bool en);
     int enableLraPeriodAverage(bool en);
@@ -47,6 +48,7 @@ public:
     int setERM();
     int setPlaybackInterval(DRV2624reg::_0dPlaybackInterval interval);
     int setDigMemGain(DRV2624reg::_0dDigMemGain gain);
+    int setRealTimeAmplitude(char amplitude);
 
     int setWaveFormSequence(char index, char value);
     int setWaitTimeSequence(char index, char time);
@@ -55,9 +57,35 @@ public:
 
     int setOverdriveOpenLoop(char value);
     int setRatedMotorVoltage(char value);
+    int setOCClamp(char value);
+    int setAutoCalTime(DRV2624reg::_2aAutoCalTime time);
+    int setBlankingTime(DRV2624reg::_28BlankingOrIdissTimeUs time);
+    int setIdissTime(DRV2624reg::_28BlankingOrIdissTimeUs time);
+    int setFbBrakeFactor(char value);
+    int setLoopGain(char value);
     int setLraMinFrequency(DRV2624reg::_27MinFreq freq);
     int setDriveTime(DRV2624reg::_27DriveTimeUs value);
     int setLraWaveShape(DRV2624reg::_2cWaveShape wave);
+    int setSampleTime(DRV2624reg::_29SampleTime time);
+    int setZcDetTime(DRV2624reg::_29ZcDetTime time);
+
+    char getDeviceId();
+    char getDeviceRevision();
+    bool getDiagResFlag();
+    bool getPrgErrorFlag();
+    bool getProcessDoneFlag();
+    bool getUVLOFlag();
+    bool getOverTempFlag();
+    bool getOCDetectFlag();
+    char getStatusFlags();
+    char getDiagZResult();
+
+    char getVoltageCompensation();
+    int setVoltageCompensation(char value);
+    char getFeedbackValue();
+    int setFeedbackValue(char value);
+    char getFeedbackGain();
+    int setFeedbackGain(DRV2624reg::_23BemfGain gain);
 
     uint16_t getLraPeriod();
 
@@ -91,4 +119,4 @@ protected:
     I2C *i2c;
 };
 
-#endif //MBED_DRV2624_H
+#endif //MBED_DRV2624

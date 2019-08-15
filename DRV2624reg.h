@@ -59,7 +59,8 @@ public:
     union _05 {
         struct d
         {
-            unsigned LRA_PERIOD_HI : 8;
+            unsigned LRA_PERIOD_HI : 2;
+            unsigned RESERVED : 6;
         } data;
         char reg;
     };
@@ -75,10 +76,10 @@ public:
     union _07 {
         struct d
         {
-            unsigned TRIG_PIN_FUNC : 2;
             unsigned MODE : 2;
-            unsigned LRA_PERIOD_AVG_DIS : 1;
+            unsigned TRIG_PIN_FUNC : 2;
             unsigned LINEREG_COMP_SEL : 2;
+            unsigned LRA_PERIOD_AVG_DIS : 1;
             unsigned I2C_BCAST_EN : 1;
         } data;
         char reg;
@@ -103,12 +104,12 @@ public:
         struct d
         {
             unsigned RESERVED : 2;
-            unsigned LRA_ERM : 1;
             unsigned INPUT_SLOPE_CHECK : 1;
+            unsigned AUTO_BRK_INTO_STBY : 1;
+            unsigned AUTO_BRK_OL : 1;
             unsigned HYBRID_LOOP : 1;
             unsigned CONTROL_LOOP : 1;
-            unsigned AUTO_BRK_OL : 1;
-            unsigned AUTO_BRK_INTO_STBY : 1;
+            unsigned LRA_ERM : 1;
         } data;
         char reg;
     };
@@ -142,7 +143,8 @@ public:
     union _0C {
         struct d
         {
-            unsigned GO : 8;
+            unsigned GO : 1;
+            unsigned RESERVED : 7;
         } data;
         char reg;
     };
@@ -278,7 +280,8 @@ public:
     union _19 {
         struct d
         {
-            unsigned WAV_SEQ_MAIN_LOOP : 8;
+            unsigned WAV_SEQ_MAIN_LOOP : 3;
+            unsigned RESERVED : 5;
         } data;
         char reg;
     };
@@ -356,6 +359,13 @@ public:
             unsigned NG_THRESH : 1;
         } data;
         char reg;
+    };
+
+    enum class _23BemfGain {
+        _5x,
+        _10x,
+        _20x,
+        _30x
     };
 
     union _24 {
@@ -444,6 +454,25 @@ public:
         char reg;
     };
 
+    enum class _28BlankingOrIdissTimeUs {
+        lra15erm45,
+        lra25erm75,
+        lra50erm150,
+        lra75erm225,
+        lra90,
+        lra105,
+        lra120,
+        lra135,
+        lra150,
+        lra165,
+        lra180,
+        lra195,
+        lra210,
+        lra235,
+        lra260,
+        lra285,
+    };
+
     union _29 {
         struct d
         {
@@ -455,6 +484,20 @@ public:
         char reg;
     };
 
+    enum class _29SampleTime {
+        _150us,
+        _200us,
+        _250us,
+        _300us
+    };
+
+    enum class _29ZcDetTime {
+        _100us,
+        _200us,
+        _300us,
+        _390us
+    };
+
     union _2A {
         struct d
         {
@@ -462,6 +505,14 @@ public:
             unsigned RESERVED : 6;
         } data;
         char reg;
+    };
+
+    enum class _2aAutoCalTime
+    {
+        _250ms,
+        _500ms,
+        _1s,
+        triggerControlled
     };
 
     union _2C {
@@ -485,6 +536,7 @@ public:
         struct d
         {
             unsigned OL_LRA_PERIOD_HI : 2;
+            unsigned RESERVED : 6;
         } data;
         char reg;
     };

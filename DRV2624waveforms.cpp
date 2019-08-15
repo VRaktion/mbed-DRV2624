@@ -1,6 +1,3 @@
-#ifndef MBED_DRV2624_WAVEFORMS_CPP
-#define MBED_DRV2624_WAVEFORMS_CPP
-
 #include "DRV2624waveforms.h"
 
 const char waveform0[] = {
@@ -14,5 +11,3 @@ const char waveform1[] = {
     0x80 | 0, 100,   //ramp
     0x7F & 0, 50,    //fix
 };
-
-#endif //MBED_DRV2624_WAVEFORMS_CPP
