@@ -44,7 +44,8 @@ int DRV2624::init()
     return 0;
 }
 
-int DRV2624::calibrateLRA(){
+int DRV2624::calibrateLRA()
+{
     // setMode(DRV2624reg::_07Mode::autoLevelCalib);
     // setLRA();
     // this->setFbBrakeFactor(3);
@@ -63,70 +64,79 @@ int DRV2624::calibrateLRA(){
 
 //////REG00//////
 
-    char DRV2624::getDeviceId(){
-        DRV2624reg::_00 reg00;
-        readRegister(0x00, &(reg00.reg));
-        return reg00.data.CHIPID;
-    }
+char DRV2624::getDeviceId()
+{
+    DRV2624reg::_00 reg00;
+    readRegister(0x00, &(reg00.reg));
+    return reg00.data.CHIPID;
+}
 
-    char DRV2624::getDeviceRevision(){
-        DRV2624reg::_00 reg00;
-        readRegister(0x00, &(reg00.reg));
-        return reg00.data.REV;
-    }
+char DRV2624::getDeviceRevision()
+{
+    DRV2624reg::_00 reg00;
+    readRegister(0x00, &(reg00.reg));
+    return reg00.data.REV;
+}
 
 //////REG01//////
 
-    bool DRV2624::getDiagResFlag(){
-        DRV2624reg::_01 reg01;
-        readRegister(0x01, &(reg01.reg));
-        return reg01.data.DIAG_RESULT;
-    }
+bool DRV2624::getDiagResFlag()
+{
+    DRV2624reg::_01 reg01;
+    readRegister(0x01, &(reg01.reg));
+    return reg01.data.DIAG_RESULT;
+}
 
-    bool DRV2624::getPrgErrorFlag(){
-        DRV2624reg::_01 reg01;
-        readRegister(0x01, &(reg01.reg));
-        return reg01.data.PRG_ERROR;
-    }
+bool DRV2624::getPrgErrorFlag()
+{
+    DRV2624reg::_01 reg01;
+    readRegister(0x01, &(reg01.reg));
+    return reg01.data.PRG_ERROR;
+}
 
-    bool DRV2624::getProcessDoneFlag(){
-        DRV2624reg::_01 reg01;
-        readRegister(0x01, &(reg01.reg));
-        return reg01.data.PROCESS_DONE;
-    }
+bool DRV2624::getProcessDoneFlag()
+{
+    DRV2624reg::_01 reg01;
+    readRegister(0x01, &(reg01.reg));
+    return reg01.data.PROCESS_DONE;
+}
 
-    bool DRV2624::getUVLOFlag(){
-        DRV2624reg::_01 reg01;
-        readRegister(0x01, &(reg01.reg));
-        return reg01.data.UVLO;
-    }
+bool DRV2624::getUVLOFlag()
+{
+    DRV2624reg::_01 reg01;
+    readRegister(0x01, &(reg01.reg));
+    return reg01.data.UVLO;
+}
 
-    bool DRV2624::getOverTempFlag(){
-        DRV2624reg::_01 reg01;
-        readRegister(0x01, &(reg01.reg));
-        return reg01.data.OVER_TEMP;
-    }
+bool DRV2624::getOverTempFlag()
+{
+    DRV2624reg::_01 reg01;
+    readRegister(0x01, &(reg01.reg));
+    return reg01.data.OVER_TEMP;
+}
 
-    bool DRV2624::getOCDetectFlag(){
-        DRV2624reg::_01 reg01;
-        readRegister(0x01, &(reg01.reg));
-        return reg01.data.OC_DETECT;
-    }
+bool DRV2624::getOCDetectFlag()
+{
+    DRV2624reg::_01 reg01;
+    readRegister(0x01, &(reg01.reg));
+    return reg01.data.OC_DETECT;
+}
 
-    char DRV2624::getStatusFlags(){
-        DRV2624reg::_01 reg01;
-        readRegister(0x01, &(reg01.reg));
-        return reg01.reg;
-    }
+char DRV2624::getStatusFlags()
+{
+    DRV2624reg::_01 reg01;
+    readRegister(0x01, &(reg01.reg));
+    return reg01.reg;
+}
 
 //////REG03//////
 
-    char DRV2624::getDiagZResult(){
-        DRV2624reg::_03 reg03;
-        readRegister(0x03, &(reg03.reg));
-        return reg03.reg;
-    }
-
+char DRV2624::getDiagZResult()
+{
+    DRV2624reg::_03 reg03;
+    readRegister(0x03, &(reg03.reg));
+    return reg03.reg;
+}
 
 //////REG07//////
 
@@ -173,7 +183,7 @@ int DRV2624::setLRA()
     // return enableRegisterFlag(REG08::_ADDR, REG08::LRA_ERM, true);
     DRV2624reg::_08 reg08;
     readRegister(0x08, &(reg08.reg));
-    reg08.data.LRA_ERM = 1;//0;//
+    reg08.data.LRA_ERM = 1; //0;//
     return writeRegister(0x08, &(reg08.reg));
 }
 
@@ -182,7 +192,7 @@ int DRV2624::setERM()
     // return enableRegisterFlag(REG08::_ADDR, REG08::LRA_ERM, false);
     DRV2624reg::_08 reg08;
     readRegister(0x08, &(reg08.reg));
-    reg08.data.LRA_ERM = 0;//1;//
+    reg08.data.LRA_ERM = 0; //1;//
     return writeRegister(0x08, &(reg08.reg));
 }
 
@@ -240,7 +250,7 @@ int DRV2624::setDigMemGain(DRV2624reg::_0dDigMemGain gain)
 
 //////REG0E//////
 
-int DRV2624::setRealTimeAmplitude(char amplitude)//signed!
+int DRV2624::setRealTimeAmplitude(char amplitude) //signed!
 {
     return writeRegister(0x0E, &amplitude);
 }
@@ -250,13 +260,13 @@ int DRV2624::setRealTimeAmplitude(char amplitude)//signed!
 int DRV2624::setWaveFormSequence(char index, char value)
 {
     value &= 0x7F;
-    return writeRegister(indexToAddress(index), &value);
+    return writeRegister(indexToHeaderAddress(index), &value);
 }
 
 int DRV2624::setWaitTimeSequence(char index, char time)
 {
     time |= 0x80;
-    return writeRegister(indexToAddress(index), &time);
+    return writeRegister(indexToHeaderAddress(index), &time);
 }
 
 //////REG17 - REG18//////
@@ -497,9 +507,11 @@ int DRV2624::setLraWaveShape(DRV2624reg::_2cWaveShape wave)
 {
     // return enableRegisterFlag(REG2C::_ADDR, REG2C::LRA_WAVE_SHAPE, (bool)wave);
     DRV2624reg::_2C reg2C;
-    readRegister(0x2C, &(reg2C.reg));
+    int status = 0;
+    status &= readRegister(0x2C, &(reg2C.reg));
     reg2C.data.LRA_WAVE_SHAPE = (unsigned)wave;
-    return writeRegister(0x2C, &(reg2C.reg));
+    status &= writeRegister(0x2C, &(reg2C.reg));
+    return status;
 }
 
 //////REG2E-REG2F//////
@@ -518,6 +530,8 @@ uint16_t DRV2624::getLraPeriod()
 
 //////REGFD-REGFF//////
 
+Serial pcd(USBTX, USBRX, "debug", 115200);
+
 int DRV2624::writeHeaderEntry(char index, uint16_t ramStartAddr, char length, char repeats)
 {
     if (index < 1 || index > 127)
@@ -525,8 +539,8 @@ int DRV2624::writeHeaderEntry(char index, uint16_t ramStartAddr, char length, ch
         return -1;
     }
 
-    if (!(length % 2) || length < 2 || length > 30) //5Bit
-    {                                               //cannot be odd (time-value pairs), 0 is error, max 15 pairs
+    if (length % 2 || length < 2 || length > 30) //5Bit
+    {                                            //cannot be odd (time-value pairs), 0 is error, max 15 pairs
         return -1;
     }
 
@@ -535,7 +549,7 @@ int DRV2624::writeHeaderEntry(char index, uint16_t ramStartAddr, char length, ch
         return -1;
     }
 
-    char configByte = ((repeats & 0x7) << 5) | length;
+    char configByte = (((repeats - 1) & 0x7) << 5) | length; //0 = one repeat, 7 = infinite repeat
     char indexBuffer[3] = {
         (char)(ramStartAddr >> 8),     //start Address upper byte
         (char)(ramStartAddr & 0x00FF), //start Address lower byte
@@ -545,26 +559,46 @@ int DRV2624::writeHeaderEntry(char index, uint16_t ramStartAddr, char length, ch
     return writeRAMBuffer(headerAddr, indexBuffer, 3);
 }
 
+int DRV2624::writeWaveFormToRAMsimple(char index, const char *buffer, char repeats)
+{
+    uint16_t ramStartAddr = indexToRamAddress(index);
+    char length = sizeof(buffer);
+    if (ramStartAddr != 0)
+    {
+        pcd.printf("length %d \r\n", length);
+        return writeWaveFormToRAM(index, ramStartAddr, (char *)buffer, length, repeats);
+    }
+    else
+    {
+        return -1;
+    }
+}
+
 int DRV2624::writeWaveFormToRAM(char index, uint16_t ramStartAddr, char *buffer, char length, char repeats)
 {
-    writeHeaderEntry(index, ramStartAddr, length, repeats);
-    return writeRAMBuffer(ramStartAddr, buffer, length);
+    int status = 0;
+    status &= writeHeaderEntry(index, ramStartAddr, length, repeats);
+    status &= writeRAMBuffer(ramStartAddr, buffer, length);
+    return status;
 }
 
 int DRV2624::setRAMAddr(uint16_t ramAddr)
 {
-    if (ramAddr > 0x7FF)
+    if (ramAddr > 0x07FF)
     {
+        pcd.printf("ram addr error\r\n");
         return -1;
     }
 
-    char cmd[3] = {0xFD, (char)(ramAddr >> 8), (char)(ramAddr & 0x00FF)};
-    return i2c->write((int)address, cmd, 3);
+    // char cmd[3] = {0xFD, (char)(ramAddr >> 8), (char)(ramAddr & 0x00FF)};
+    // return i2c->write((int)address, cmd, 3);
 
-    // char ramAddrHi = (char)(ramAddr >> 8);
-    // char ramAddrLo = (char)(ramAddr & 0x00FF);
-    // writeRegister(REGFD::_ADDR, &ramAddrHi);
-    // writeRegister(REGFE::_ADDR, &ramAddrLo);
+    char ramAddrHi = (char)(ramAddr >> 8);
+    char ramAddrLo = (char)(ramAddr & 0x00FF);
+    int status = 0;
+    status &= writeRegister(0xFD, &ramAddrHi);
+    status &= writeRegister(0xFE, &ramAddrLo);
+    return status;
 }
 
 int DRV2624::writeConstWave(char voltage, char time)
@@ -587,47 +621,53 @@ int DRV2624::writeRampWave(char voltage, char time)
 
 int DRV2624::writeRAM1Byte(uint16_t ramAddr, char *value)
 {
-    setRAMAddr(ramAddr);
-    return writeRegister(0xFF, value);
+    int status = 0;
+    status &= setRAMAddr(ramAddr);
+    status &= writeRegister(0xFF, value);
+    return status;
 }
 
 int DRV2624::readRAM1Byte(uint16_t ramAddr, char *value)
 {
-    setRAMAddr(ramAddr);
-    return readRegister(0xFF, value);
+    int status = 0;
+    status &= setRAMAddr(ramAddr);
+    status &= readRegister(0xFF, value);
+    return status;
 }
 
 int DRV2624::writeRAMBuffer(uint16_t ramAddr, char *buffer, char length)
 {
-    setRAMAddr(ramAddr);
+    int status = 0;
+    status &= setRAMAddr(ramAddr);
     if (ramAddr + (uint16_t)length > 0x7FF)
     {
         return -1;
     }
     for (uint16_t i = 0; i < length; i++)
     {
-        writeRegister(0xFF, buffer + i);
+        status &= writeRegister(0xFF, buffer + i);
     }
-    return 0;
+    return status;
 }
 
 int DRV2624::readRAMBuffer(uint16_t ramAddr, char *buffer, char length)
 {
-    setRAMAddr(ramAddr);
+    int status = 0;
+    status &= setRAMAddr(ramAddr);
     if (ramAddr + (uint16_t)length > 0x7FF)
     {
         return -1;
     }
     for (uint16_t i = 0; i < length; i++)
     {
-        readRegister(0xFF, buffer + i);
+        status &= readRegister(0xFF, buffer + i);
     }
-    return 0;
+    return status;
 }
 
 //////HELPERS//////
 
-char DRV2624::indexToAddress(char index)
+char DRV2624::indexToHeaderAddress(char index)
 {
     switch (index)
     {
@@ -662,10 +702,23 @@ char DRV2624::indexToAddress(char index)
     return 0;
 }
 
+uint16_t DRV2624::indexToRamAddress(char id)
+{
+    if (id < 31)
+    {
+        return ((uint16_t)id - 1) * 0x1E + 0x5B;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
 int DRV2624::enableRegisterFlag(const char regAddr, char mask, bool en)
 {
     char regValue;
-    readRegister(regAddr, &regValue);
+    int status = 0;
+    status &= readRegister(regAddr, &regValue);
     if (en)
     {
         setBit(&regValue, mask);
@@ -674,7 +727,8 @@ int DRV2624::enableRegisterFlag(const char regAddr, char mask, bool en)
     {
         unsetBit(&regValue, mask);
     }
-    return writeRegister(regAddr, &regValue);
+    status &= writeRegister(regAddr, &regValue);
+    return status;
 }
 
 int DRV2624::setRegisterValue(const char regAddr, char mask, char value)
@@ -684,28 +738,28 @@ int DRV2624::setRegisterValue(const char regAddr, char mask, char value)
         ; //getting the mask shift
     char regValue;
 
-    readRegister(regAddr, &regValue);
+    int status = 0;
+    status &= readRegister(regAddr, &regValue);
     value &= ~mask;                   //bereich platt machen
     value |= (value << shift) & mask; //bereich neu belegen
-    return writeRegister(regAddr, &regValue);
+    status &= writeRegister(regAddr, &regValue);
+    return status;
 }
-
-// Serial pcd(USBTX, USBRX, "debug", 115200);
 
 int DRV2624::writeRegister(const char reg, char *value)
 {
     char cmd[2] = {reg, *value};
-    // pcd.printf("write reg %x: %x\r\n", reg, *value);
-    i2c->write((int)address, cmd, 2);
-    return 0;
+    pcd.printf("write reg %x: %x\r\n", reg, *value);
+    return i2c->write((int)address, cmd, 2);
 }
 
 int DRV2624::readRegister(const char reg, char *value)
 {
-    i2c->write((int)address, (const char *)&reg, 1);
-    i2c->read((int)address, (char *)value, 1);
-    // pcd.printf("read reg %x: %x\r\n", reg, *value);
-    return 0;
+    int status = 0;
+    status &= i2c->write((int)address, (const char *)&reg, 1);
+    status &= i2c->read((int)address, (char *)value, 1);
+    pcd.printf("read reg %x: %x\r\n", reg, *value);
+    return status;
 }
 
 void DRV2624::setBit(char *reg, char mask)

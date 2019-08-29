@@ -90,9 +90,10 @@ public:
     uint16_t getLraPeriod();
 
     int writeHeaderEntry(char index, uint16_t ramStartAddr, char length, char repeats);
+    int writeWaveFormToRAMsimple(char index, const char *buffer, char repeats);
     int writeWaveFormToRAM(char index, uint16_t ramStartAddr, char *buffer, char length, char repeats);
 
-    char indexToAddress(char index);
+    char indexToHeaderAddress(char index);
 
     int setRAMAddr(uint16_t ramAddr);
 
@@ -113,6 +114,9 @@ public:
 
     int enableRegisterFlag(const char regAddr, char mask, bool en);
     int setRegisterValue(const char regAddr, char mask, char value);
+
+private:
+    uint16_t indexToRamAddress(char id);
 
 protected:
     char address;

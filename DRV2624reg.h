@@ -163,8 +163,8 @@ public:
 
     enum class _0dPlaybackInterval
     {
-        _1ms,
-        _5ms
+        _5ms,
+        _1ms
     };
 
     enum class _0dDigMemGain
