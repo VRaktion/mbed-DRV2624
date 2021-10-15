@@ -37,6 +37,7 @@ public:
     int enableI2CBroadcast(bool en);
     int enableLraPeriodAverage(bool en);
     int enableControlLoop(bool en);
+    int enableAutoBreak(bool en, bool openLoop = false);
     int enableHybridLoop(bool en);
 
     int go();
@@ -57,7 +58,7 @@ public:
 
     int setOverdriveOpenLoop(char value);
     int setRatedMotorVoltage(char value);
-    int setOCClamp(char value);
+    int setODClamp(char value);
     int setAutoCalTime(DRV2624reg::_2aAutoCalTime time);
     int setBlankingTime(DRV2624reg::_28BlankingOrIdissTimeUs time);
     int setIdissTime(DRV2624reg::_28BlankingOrIdissTimeUs time);

@@ -38,27 +38,34 @@ DRV2624::DRV2624(I2C *p_i2c)
 
 int DRV2624::init()
 {
-    ThisThread::sleep_for(1);
-    setMode(DRV2624reg::_07Mode::realTime);
+    wait_us(1000);
+    setMode(DRV2624reg::_07Mode::realTime); //remove Device from standby
 
     return 0;
 }
 
-int DRV2624::calibrateLRA()
+int DRV2624::calibrateLRA() //for G1040003D @ 170Hz
 {
-    // setMode(DRV2624reg::_07Mode::autoLevelCalib);
-    // setLRA();
+    setMode(DRV2624reg::_07Mode::autoLevelCalib);
+    setLRA();
+    this->setRatedMotorVoltage(105);
+    this->setODClamp(167);
+    this->setDriveTime(DRV2624reg::_27DriveTimeUs::lra2900erm5800); //2.94ms
+
+    //////////
+
     // this->setFbBrakeFactor(3);
     // this->setLoopGain(2);
     // this->setRatedMotorVoltage(0x6B);
-    // this->setOCClamp(0x79);
-    // this->setAutoCalTime(DRV2624reg::_2aAutoCalTime::triggerControlled);//DRV2624reg::_2aAutoCalTime::_1);//
+
+    // this->setAutoCalTime(DRV2624reg::_2aAutoCalTime::_250ms);//DRV2624reg::_2aAutoCalTime::triggerControlled);//trigger is not connected
     // this->setDriveTime(DRV2624reg::_27DriveTimeUs::lra2500erm5000);//2.5ms == 200hz
     // this->setSampleTime(DRV2624reg::_29SampleTime::_300us);
     // this->setBlankingTime(DRV2624reg::_28BlankingOrIdissTimeUs::lra25erm75);
     // this->setIdissTime(DRV2624reg::_28BlankingOrIdissTimeUs::lra25erm75);
     // this->setZcDetTime(DRV2624reg::_29ZcDetTime::_100us);
-    // this->go();
+    this->go();
+
     return 0;
 }
 
@@ -202,6 +209,19 @@ int DRV2624::enableControlLoop(bool en)
     DRV2624reg::_08 reg08;
     readRegister(0x08, &(reg08.reg));
     reg08.data.CONTROL_LOOP = (unsigned)!en;
+    return writeRegister(0x08, &(reg08.reg));
+}
+
+int DRV2624::enableAutoBreak(bool en, bool openLoop)
+{
+    // return enableRegisterFlag(REG08::_ADDR, REG08::CONTROL_LOOP, en);
+    DRV2624reg::_08 reg08;
+    readRegister(0x08, &(reg08.reg));
+    reg08.data.AUTO_BRK_INTO_STBY = (unsigned)en;
+    if (openLoop)
+    {
+        reg08.data.AUTO_BRK_OL = (unsigned)en;
+    }
     return writeRegister(0x08, &(reg08.reg));
 }
 
@@ -366,7 +386,7 @@ int DRV2624::setRatedMotorVoltage(char value)
 
 //////REG20//////
 
-int DRV2624::setOCClamp(char value)
+int DRV2624::setODClamp(char value)
 {
     return writeRegister(0x20, &value);
 }
@@ -530,7 +550,7 @@ uint16_t DRV2624::getLraPeriod()
 
 //////REGFD-REGFF//////
 
-Serial pcd(USBTX, USBRX, "debug", 115200);
+// Serial pcd(USBTX, USBRX, "debug", 115200);
 
 int DRV2624::writeHeaderEntry(char index, uint16_t ramStartAddr, char length, char repeats)
 {
@@ -565,7 +585,7 @@ int DRV2624::writeWaveFormToRAMsimple(char index, const char *buffer, char repea
     char length = sizeof(buffer);
     if (ramStartAddr != 0)
     {
-        pcd.printf("length %d \r\n", length);
+        // pcd.printf("length %d \r\n", length);
         return writeWaveFormToRAM(index, ramStartAddr, (char *)buffer, length, repeats);
     }
     else
@@ -586,7 +606,7 @@ int DRV2624::setRAMAddr(uint16_t ramAddr)
 {
     if (ramAddr > 0x07FF)
     {
-        pcd.printf("ram addr error\r\n");
+        // pcd.printf("ram addr error\r\n");
         return -1;
     }
 
@@ -734,8 +754,14 @@ int DRV2624::enableRegisterFlag(const char regAddr, char mask, bool en)
 int DRV2624::setRegisterValue(const char regAddr, char mask, char value)
 {
     uint8_t shift = 0;
-    while (!(mask & (1 << shift++)))
+    while (!(mask & (1 << shift++)) && shift < 8)
         ; //getting the mask shift
+
+    if (shift > 8)
+    {
+        return 1;
+    }
+
     char regValue;
 
     int status = 0;
@@ -749,16 +775,34 @@ int DRV2624::setRegisterValue(const char regAddr, char mask, char value)
 int DRV2624::writeRegister(const char reg, char *value)
 {
     char cmd[2] = {reg, *value};
-    pcd.printf("write reg %x: %x\r\n", reg, *value);
-    return i2c->write((int)address, cmd, 2);
+    // pcd.printf("write reg %x: %x\r\n", reg, *value);
+
+    int status = i2c->write((int)address, cmd, 2);
+
+    if (status)
+    {
+        printf("ERROR writing DRV2624\n\r");
+    }
+    return status;
 }
 
 int DRV2624::readRegister(const char reg, char *value)
 {
     int status = 0;
-    status &= i2c->write((int)address, (const char *)&reg, 1);
-    status &= i2c->read((int)address, (char *)value, 1);
-    pcd.printf("read reg %x: %x\r\n", reg, *value);
+
+    status = i2c->write((int)address, (const char *)&reg, 1);
+    if (status)
+    {
+        printf("ERROR reading DRV2624: write\n\r");
+        return status;
+    }
+    status = i2c->read((int)address, (char *)value, 1);
+
+    // pcd.printf("read reg %x: %x\r\n", reg, *value);
+    if (status)
+    {
+        printf("ERROR reading DRV2624: read\n\r");
+    }
     return status;
 }
 
